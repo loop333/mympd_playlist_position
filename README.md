@@ -1,4 +1,4 @@
-# myMPD Maintain Stored Playlist Positions
+# myMPD: Maintain Stored Playlist Positions
 Save current play position for stored playlists
 
 For MPD 0.24 (script uses stickers for stored playlists)
