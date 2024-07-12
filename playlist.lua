@@ -191,7 +191,9 @@ if mympd_arguments.trigger == "player" then
       local position = mpd_get_playlist_sticker(current_playlist, "position")
       if position then
         print("found position sticker " .. position)
-        mpd_play_position(position)
+        if tonumber(position) > 0 then
+          mpd_play_position(position)
+        end
       else
         print("position sticker not found")
       end
