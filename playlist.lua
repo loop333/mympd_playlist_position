@@ -101,18 +101,14 @@ end
 function mpd_play_position(position)
   print("mpd_play_position " .. position)
   local cmd = "play " .. position
-  print(cmd)
   local output = mpd_command(cmd)
-  print(output)
   return nil
 end
 
 function mpd_get_playlist_sticker(playlist, sticker)
   print("mpd_get_playlist_sticker " .. playlist .. " " .. sticker)
   local cmd = "sticker get playlist \"" .. playlist .. "\" " .. sticker
-  print(cmd)
   local output = mpd_command(cmd)
-  print(output)
   for line in output:gmatch("([^\n]*)\n?") do
     local value = value_sticker_for(line, sticker)
     if value then
@@ -140,28 +136,6 @@ function mympd_delete_variable(p_key)
 end
 
 -- main
-if mympd_arguments.trigger == "test" then
-  print("test")
-  local value = value_for("file: 123.mp3", "file")
-  print(value)
-  local status = mpd_command("status")
-  print(status)
-  for i, playlist in ipairs(mpd_playlists()) do
-    print(playlist)
-    local playlist_first_song = mpd_playlist_first_song(playlist)
-    print(playlist_first_song)
-    local playlist_len = mpd_playlist_len(playlist)
-    print(playlist_len)
-  end
-  local queue_first_song = mpd_queue_first_song()
-  print(queue_first_song)
-  local queue_len = mpd_queue_len()
-  print(queue_len)
-  local current_playlist = mpd_current_playlist()
-  print(current_playlist)
-  return "end test"
-end
-
 if mympd_arguments.trigger == "queue" then
   print("queue")
   if mympd_env.var_playlist_current_playlist then
@@ -202,8 +176,12 @@ if mympd_arguments.trigger == "player" then
     end
   end
 
-  print("var_playlist_current_playlist", mympd_env.var_playlist_current_playlist)
+  -- on stop save pos to playlist sticker
+  if play_state == 3 and song_pos > 0 and mympd_env.var_playlist_current_playlist then
+    mpd_set_playlist_sticker(mympd_env.var_playlist_current_playlist, "position", mympd_env.var_playlist_current_position)
+  end
 
+  -- on play save pos to var
   if play_state == 2 and song_pos > 0 and mympd_env.var_playlist_current_playlist then
     print("playing stored playlist " .. song_pos)
     mympd_set_variable("playlist_current_position", song_pos)
