@@ -84,6 +84,18 @@ function mpd_queue_len()
 end
 
 function mpd_current_playlist()
+  local cmd = "status"
+  local output = mpd_command(cmd)
+  for line in output:gmatch("([^\n]*)\n?") do
+    local playlist = value_for(line, "lastloadedplaylist")
+    if playlist then
+      return playlist
+    end
+  end
+  return nil
+end
+
+function mpd_current_playlist_old()
   local queue_first_song = mpd_queue_first_song()
   local queue_len = mpd_queue_len()
   for i, playlist in ipairs(mpd_playlists()) do
@@ -154,6 +166,7 @@ if mympd_arguments.trigger == "player" then
   local play_state = mympd_state.play_state
   local elapsed_time = mympd_state.elapsed_time
   local song_pos = mympd_state.song_pos
+  local queue_length = mympd_state.queue_length
 
   if play_state == 2 and song_pos == 0 and elapsed_time < 5 then
     print("starting new playlist")
@@ -164,8 +177,9 @@ if mympd_arguments.trigger == "player" then
       mympd_set_variable("playlist_current_position", song_pos)
       local position = mpd_get_playlist_sticker(current_playlist, "position")
       if position then
-        print("found position sticker " .. position)
-        if tonumber(position) > 0 then
+        position = tonumber(position)
+        print("found position sticker: " .. position .. ", queue_length: " .. queue_length)
+        if position > 0 and position+1 < queue_length then
           mpd_play_position(position)
         end
       else
@@ -189,6 +203,9 @@ if mympd_arguments.trigger == "player" then
 
   return "end player"
 end
+
+print("end unknown " .. mympd_arguments.trigger)
+return "end unknown " .. mympd_arguments.trigger
 
 print("end unknown " .. mympd_arguments.trigger)
 return "end unknown " .. mympd_arguments.trigger
