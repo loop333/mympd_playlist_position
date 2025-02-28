@@ -150,8 +150,8 @@ end
 -- main
 if mympd_arguments.trigger == "queue" then
   print("queue")
-  if mympd_env.var_playlist_current_playlist then
-    mpd_set_playlist_sticker(mympd_env.var_playlist_current_playlist, "position", mympd_env.var_playlist_current_position)
+  if mympd_env.var.playlist_current_playlist then
+    mpd_set_playlist_sticker(mympd_env.var.playlist_current_playlist, "position", mympd_env.var.playlist_current_position)
   end
   mympd_delete_variable("playlist_current_playlist")
   mympd_delete_variable("playlist_current_position")
@@ -191,12 +191,12 @@ if mympd_arguments.trigger == "player" then
   end
 
   -- on stop save pos to playlist sticker
-  if play_state == 3 and song_pos > 0 and mympd_env.var_playlist_current_playlist then
-    mpd_set_playlist_sticker(mympd_env.var_playlist_current_playlist, "position", mympd_env.var_playlist_current_position)
+  if play_state == 3 and song_pos > 0 and mympd_env.var.playlist_current_playlist then
+    mpd_set_playlist_sticker(mympd_env.var.playlist_current_playlist, "position", mympd_env.var.playlist_current_position)
   end
 
   -- on play save pos to var
-  if play_state == 2 and song_pos > 0 and mympd_env.var_playlist_current_playlist then
+  if play_state == 2 and song_pos > 0 and mympd_env.var.playlist_current_playlist then
     print("playing stored playlist " .. song_pos)
     mympd_set_variable("playlist_current_position", song_pos)
   end
